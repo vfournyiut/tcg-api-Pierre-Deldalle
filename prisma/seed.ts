@@ -4,6 +4,7 @@ import { join } from "path";
 import { prisma } from "../src/database";
 import { CardModel } from "../src/generated/prisma/models/Card";
 import { PokemonType } from "../src/generated/prisma/enums";
+import { hash } from "crypto";
 
 async function main() {
   console.log("🌱 Starting database seed...");
@@ -25,6 +26,11 @@ async function main() {
       {
         username: "blue",
         email: "blue@example.com",
+        password: hashedPassword,
+      },
+      {
+        email: "user@example.com",
+        username: "username",
         password: hashedPassword,
       },
     ],
