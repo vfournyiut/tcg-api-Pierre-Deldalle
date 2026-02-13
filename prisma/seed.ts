@@ -1,10 +1,11 @@
 import bcrypt from "bcryptjs";
+import { hash } from "crypto";
 import { readFileSync } from "fs";
 import { join } from "path";
+
 import { prisma } from "../src/database";
-import { CardModel } from "../src/generated/prisma/models/Card";
 import { PokemonType } from "../src/generated/prisma/enums";
-import { hash } from "crypto";
+import { CardModel } from "../src/generated/prisma/models/Card";
 
 async function main() {
   console.log("🌱 Starting database seed...");
@@ -70,7 +71,7 @@ async function main() {
 
   console.log(`✅ Created ${pokemonData.length} Pokemon cards`);
 
-  function selectRandomCards(cards: any[], count: number) {
+  function selectRandomCards(cards: unknown[], count: number) {
     const shuffled = [...cards].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, count);
   }
