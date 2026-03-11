@@ -95,7 +95,6 @@ decksRouter.post(
   },
 );
 
-
 //GET /api/decks/mine
 //Récupérer tous les decks de l'utilisateur authentifié
 //Chaque deck est retourné avec ses cartes associées
@@ -206,7 +205,6 @@ decksRouter.get(
   },
 );
 
-
 //PATCH /api/decks/:id
 //Modifier le nom et/ou les cartes d'un deck existant
 decksRouter.patch(
@@ -268,6 +266,11 @@ decksRouter.patch(
         });
       }
 
+      // 4bis. Vérifier qu'au moins un champ valide a été fourni
+      if (!name && !cards) {
+        return res.status(400).json({ error: "Aucun champ à modifier" });
+      }
+
       // 7. Mettre à jour le nom du deck si nécessaire
       const updatedDeck = await prisma.deck.update({
         where: { id: deckId },
@@ -284,7 +287,6 @@ decksRouter.patch(
     }
   },
 );
-
 
 //DELETE /api/decks/:id
 //Supprimer définitivement un deck et ses associations

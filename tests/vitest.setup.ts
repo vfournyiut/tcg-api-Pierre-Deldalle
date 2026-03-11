@@ -7,6 +7,15 @@ vi.mock('../src/database', () => ({
     prisma: mockDeep<PrismaClient>()
 }));
 
+// Mock du middleware d'authentification
+vi.mock('../src/auth/auth.middleware', () => ({
+    authenticateToken: vi.fn((req, res, next) => {
+        // Simule un utilisateur authentifié
+        req.userId = 1
+        next()
+    }),
+}))
+
 beforeEach(() => {
     mockReset(prismaMock);
 });
