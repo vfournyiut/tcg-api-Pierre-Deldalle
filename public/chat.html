@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Socket.IO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #messages {
+            border: 1px solid #ddd;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        #messages div {
+            margin: 5px 0;
+            padding: 5px;
+        }
+
+        .system {
+            color: #666;
+            font-style: italic;
+        }
+
+        #form {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Chat Socket.IO</h1>
+    <div id="messages"></div>
+    <form id="form">
+        <input autocomplete="off" id="input" placeholder="Votre message..." />
+        <button>Envoyer</button>
+    </form>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+
+        const socket = io('http://localhost:3000')
+        const messages = document.getElementById('messages')
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+
+        // Récupérer le nom d'utilisateur
+        const username = prompt('Entrez votre pseudo:') || 'Anonyme'
+        socket.emit('user', username)
+
+        // Fonction pour ajouter un message
+        function addMessage(text, isSystem = false) {
+            const div = document.createElement('div')
+            div.className = isSystem ? 'system' : ''
+            div.textContent = text
+            messages.appendChild(div)
+            messages.scrollTop = messages.scrollHeight
+        }
+
+        // Écouter les événements du serveur
+        socket.on('welcome', (msg) => addMessage(msg, true))
+        socket.on('user-joined', (msg) => addMessage(msg, true))
+        socket.on('message', (data) => addMessage(`${data.username}: ${data.message}`))
+
+        // Envoyer un message
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            if (input.value) {
+                socket.emit('message', username, input.value)
+                input.value = ''
+            }
+        })
+    </script>
+</body>
+
+</html>
