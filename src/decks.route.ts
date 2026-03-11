@@ -4,10 +4,30 @@ import { authenticateToken } from "./auth.middleware";
 
 export const decksRouter = Router();
 
-//POST /api/decks
-//Créer un nouveau deck pour l'utilisateur authentifié
-//Le deck doit contenir exactement 10 cartes valides
-//Le deck est automatiquement associé à l'utilisateur connecté
+/**
+ * Route POST permettant de créer un nouveau deck pour l'utilisateur authentifié.
+ *
+ * Cette route crée un deck avec exactement 10 cartes, associé à l'utilisateur
+ * connecté. Elle vérifie la validité du token JWT, la présence d'un nom,
+ * et la validité des identifiants des cartes.
+ *
+ * Méthode HTTP : POST
+ * URL : /api/decks
+ *
+ * @param {Request} req - Requête HTTP contenant dans `req.body` :
+ *   - `name` {string} : nom du deck à créer
+ *   - `cards` {number[]} : tableau de 10 numéros de pokédex
+ * @param {Response} res - Objet réponse Express utilisé pour renvoyer le résultat de la création.
+ *
+ * @returns {Response}
+ * - 201 : Deck créé avec succès, retourne le deck et ses cartes.
+ * - 400 : Nom manquant, tableau de cartes invalide ou non-existant.
+ * - 401 : Token manquant ou invalide.
+ * - 500 : Erreur serveur lors de la création du deck.
+ *
+ * @throws {Error} Peut lever une erreur lors de l'accès à la base de données
+ * ou de la validation des cartes (gérée et transformée en réponse HTTP).
+ */
 decksRouter.post(
   "/api/decks",
   authenticateToken,
@@ -95,9 +115,24 @@ decksRouter.post(
   },
 );
 
-//GET /api/decks/mine
-//Récupérer tous les decks de l'utilisateur authentifié
-//Chaque deck est retourné avec ses cartes associées
+/**
+ * Route GET permettant de récupérer tous les decks de l'utilisateur authentifié.
+ *
+ * Retourne tous les decks appartenant à l'utilisateur connecté avec les cartes associées.
+ *
+ * Méthode HTTP : GET
+ * URL : /api/decks/mine
+ *
+ * @param {Request} req - Requête HTTP contenant le token d'authentification.
+ * @param {Response} res - Objet réponse Express utilisé pour renvoyer la liste des decks.
+ *
+ * @returns {Response}
+ * - 200 : Liste des decks avec leurs cartes.
+ * - 401 : Token manquant ou invalide.
+ * - 500 : Erreur serveur lors de la récupération.
+ *
+ * @throws {Error} Peut lever une erreur lors de l'accès à la base de données.
+ */
 decksRouter.get(
   "/api/decks/mine",
   authenticateToken,
@@ -149,8 +184,27 @@ decksRouter.get(
   },
 );
 
-//GET /api/decks/:id
-//Récupérer un deck spécifique appartenant à l'utilisateur authentifié
+/**
+ * Route GET permettant de récupérer un deck spécifique appartenant à l'utilisateur.
+ *
+ * Vérifie que le deck existe et appartient à l'utilisateur connecté avant de le retourner
+ * avec ses cartes associées.
+ *
+ * Méthode HTTP : GET
+ * URL : /api/decks/:id
+ *
+ * @param {Request} req - Requête HTTP contenant le token et l'identifiant du deck dans `req.params.id`.
+ * @param {Response} res - Objet réponse Express pour renvoyer le deck et ses cartes.
+ *
+ * @returns {Response}
+ * - 200 : Deck trouvé et retourné avec ses cartes.
+ * - 401 : Token manquant ou invalide.
+ * - 403 : L'utilisateur n'est pas propriétaire du deck.
+ * - 404 : Deck inexistant.
+ * - 500 : Erreur serveur lors de la récupération.
+ *
+ * @throws {Error} Peut lever une erreur lors de l'accès à la base de données.
+ */
 decksRouter.get(
   "/api/decks/:id",
   authenticateToken,
@@ -205,8 +259,31 @@ decksRouter.get(
   },
 );
 
-//PATCH /api/decks/:id
-//Modifier le nom et/ou les cartes d'un deck existant
+/**
+ * Route PATCH permettant de modifier un deck existant (nom et/ou cartes)
+ * appartenant à l'utilisateur authentifié.
+ *
+ * Vérifie la validité du token et de l'identifiant du deck,
+ * la validité des cartes fournies, et met à jour le deck et ses associations.
+ *
+ * Méthode HTTP : PATCH
+ * URL : /api/decks/:id
+ *
+ * @param {Request} req - Requête HTTP contenant :
+ *   - `name` {string} (optionnel) : nouveau nom du deck
+ *   - `cards` {number[]} (optionnel) : tableau de 10 numéros de pokédex pour remplacer les cartes
+ * @param {Response} res - Objet réponse Express renvoyant le deck modifié ou l'erreur.
+ *
+ * @returns {Response}
+ * - 200 : Deck modifié avec succès.
+ * - 400 : Aucune modification fournie, ou tableau de cartes invalide.
+ * - 401 : Token manquant ou invalide.
+ * - 403 : L'utilisateur n'est pas propriétaire du deck.
+ * - 404 : Deck inexistant.
+ * - 500 : Erreur serveur lors de la modification.
+ *
+ * @throws {Error} Peut lever une erreur lors de la mise à jour en base de données.
+ */
 decksRouter.patch(
   "/api/decks/:id",
   authenticateToken,
@@ -288,8 +365,28 @@ decksRouter.patch(
   },
 );
 
-//DELETE /api/decks/:id
-//Supprimer définitivement un deck et ses associations
+/**
+ * Route DELETE permettant de supprimer définitivement un deck
+ * appartenant à l'utilisateur authentifié.
+ *
+ * Supprime le deck et toutes ses associations cartes/deck après vérification
+ * du token et de la propriété du deck.
+ *
+ * Méthode HTTP : DELETE
+ * URL : /api/decks/:id
+ *
+ * @param {Request} req - Requête HTTP contenant le token et l'identifiant du deck dans `req.params.id`.
+ * @param {Response} res - Objet réponse Express renvoyant un message de succès ou l'erreur.
+ *
+ * @returns {Response}
+ * - 200 : Deck supprimé avec succès.
+ * - 401 : Token manquant ou invalide.
+ * - 403 : L'utilisateur n'est pas propriétaire du deck.
+ * - 404 : Deck inexistant.
+ * - 500 : Erreur serveur lors de la suppression.
+ *
+ * @throws {Error} Peut lever une erreur lors de la suppression en base de données.
+ */
 decksRouter.delete(
   "/api/decks/:id",
   authenticateToken,
