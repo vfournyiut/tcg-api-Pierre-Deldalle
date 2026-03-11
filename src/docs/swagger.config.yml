@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  title: TCG API Documentation
+  version: 1.0.0
+  description: Documentation de l'API du TCG Backend avec authentification JWT
+  contact:
+    name: TCG Team
+    email: contact@tcg.com
+
+servers:
+  - url: http://localhost:3001
+    description: Serveur de développement
+  - url: https://api.production.com
+    description: Serveur de production
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token JWT à obtenir via /api/auth/sign-in ou /api/auth/sign-up"
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: "Alice"
+        email:
+          type: string
+          format: email
+          example: "alice@example.com"
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        pokedexNumber:
+          type: integer
+          example: 25
+        name:
+          type: string
+          example: "Pikachu"
+        hp:
+          type: integer
+          example: 60
+        type:
+          type: string
+          example: "Electric"
+        imageUrl:
+          type: string
+          example: "https://example.com/pikachu.png"
+
+    Deck:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Mon premier deck"
+        userId:
+          type: integer
+          example: 1
+        cards:
+          type: array
+          items:
+            $ref: "#/components/schemas/Card"
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Message d'erreur"
+
+tags:
+  - name: Authentication
+    description: Gestion de l'authentification (inscription, connexion)
+  - name: Cards
+    description: Gestion des cartes Pokémon
+  - name: Decks
+    description: Gestion des decks de l'utilisateur connecté
+  - name: Health
+    description: Vérification de l'état du serveur
